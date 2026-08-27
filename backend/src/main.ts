@@ -10,17 +10,31 @@ async function bootstrap() {
   // Encabezados de seguridad OWASP
   app.use(
     helmet({
-      contentSecurityPolicy: true,
-      crossOriginEmbedderPolicy: true,
+      contentSecurityPolicy: false, // Permite cargar Swagger UI sin bloqueos
+      crossOriginEmbedderPolicy: false,
     }),
   );
 
-  // Habilitar CORS seguro
+  // Orígenes permitidos (S3, variable de entorno y local)
+  const origenesPermitidos = [
+    'http://tienda-pagos-frontend-app.s3-website-us-east-1.amazonaws.com',
+    'http://localhost:5173',
+    'http://localhost:3000',
+  ];
+
+  if (process.env.CORS_ORIGIN) {
+    origenesPermitidos.push(process.env.CORS_ORIGIN);
+  }
+
+  // Habilitar CORS con soporte para preflight (OPTIONS)
   app.enableCors({
-    origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
-    methods: 'GET,POST,PUT,DELETE',
+    origin: origenesPermitidos,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
   });
+
+  // Prefijo global de rutas
+  app.setGlobalPrefix('api');
 
   // Validaciones globales estrictas de DTOs
   app.useGlobalPipes(
