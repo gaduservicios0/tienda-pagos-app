@@ -3,7 +3,7 @@ import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { PrismaClient } from '@prisma/client';
 
 @ApiTags('Productos')
-@Controller('api/productos')
+@Controller('productos')
 export class ProductosControlador {
   private prisma = new PrismaClient();
 

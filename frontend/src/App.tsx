@@ -77,7 +77,6 @@ export const App = () => {
       <ModalPago
         abierto={modalAbierto || pasoActual === 2 || pasoActual === 3}
         alCerrar={cerrarModal}
-        alFinalizar={reiniciar}
       />
     </main>
   );

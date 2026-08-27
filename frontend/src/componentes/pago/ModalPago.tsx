@@ -8,10 +8,9 @@ import axios from 'axios';
 interface Props {
   abierto: boolean;
   alCerrar: () => void;
-  alFinalizar: () => void;
 }
 
-export const ModalPago: React.FC<Props> = ({ abierto, alCerrar, alFinalizar }) => {
+export const ModalPago: React.FC<Props> = ({ abierto, alCerrar }) => {
   const dispatch = useDispatch();
   const { pasoActual, datosTarjeta, datosEntrega, montos } = useSelector((state: RootState) => state.pago);
   const [cargando, setCargando] = useState(false);
