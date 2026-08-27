@@ -1,12 +1,10 @@
 import { Controller, Post, Body, BadRequestException, Get, Param, NotFoundException } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { ProcesarPagoCasoDeUso } from '../../aplicacion/casos-de-uso/procesar-pago.caso-de-uso';
-import { RepositorioProductoPostgres } from '../adaptadores/persistencia/repositorio-producto.postgres';
 import { AdaptadorPasarela } from '../adaptadores/pasarela/adaptador-pasarela';
 import { PrismaClient } from '@prisma/client';
 
 @ApiTags('Transacciones')
-@Controller('api/transacciones')
+@Controller('transacciones')
 export class TransaccionesControlador {
   private prisma = new PrismaClient();
 
@@ -21,7 +19,7 @@ export class TransaccionesControlador {
       throw new BadRequestException('El producto no cuenta con existencias disponibles');
     }
 
-    // 1. Registrar cliente o reutilizar
+    // Registrar cliente o reutilizar
     let clienteDb = await this.prisma.cliente.findFirst({
       where: { correoElectronico: cliente.correoElectronico },
     });
@@ -37,7 +35,7 @@ export class TransaccionesControlador {
       });
     }
 
-    // 2. Registrar entrega
+    // Registrar entrega
     const entregaDb = await this.prisma.entrega.create({
       data: {
         clienteId: clienteDb.id,
@@ -49,11 +47,11 @@ export class TransaccionesControlador {
     });
 
     const referencia = `REF-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-    const tarifaBase = 500000; // $5.000 COP
-    const tarifaEnvio = 1200000; // $12.000 COP
+    const tarifaBase = 500000; // $5.000 COP en centavos
+    const tarifaEnvio = 1200000; // $12.000 COP en centavos
     const total = producto.precioEnCentavos + tarifaBase + tarifaEnvio;
 
-    // 3. Crear transacción PENDIENTE
+    // Crear transacción PENDIENTE
     const transaccion = await this.prisma.transaccion.create({
       data: {
         referencia,
@@ -68,7 +66,7 @@ export class TransaccionesControlador {
       },
     });
 
-    // 4. Invocar pasarela
+    // Invocar pasarela
     const pasarela = new AdaptadorPasarela();
     const resultado = await pasarela.procesarPago({
       tokenAceptacion,
@@ -91,7 +89,7 @@ export class TransaccionesControlador {
 
     const { idTransaccion, estado, mensaje } = resultado.value;
 
-    // 5. Actualizar transacción y descontar stock
+    // Actualizar transacción y descontar stock
     await this.prisma.transaccion.update({
       where: { id: transaccion.id },
       data: { idTransaccionPasarela: idTransaccion, estado, mensajeRespuesta: mensaje },
