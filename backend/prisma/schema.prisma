@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum EstadoTransaccion {
+  PENDIENTE
+  APROBADA
+  RECHAZADA
+  FALLIDA
+}
+
+enum EstadoEntrega {
+  PENDIENTE
+  EN_PROCESO
+  ENTREGADO
+  CANCELADO
+}
+
+model Producto {
+  id                 String         @id @default(uuid())
+  nombre             String         @map("nombre")
+  descripcion        String         @map("descripcion")
+  precioEnCentavos   Int            @map("precio_en_centavos")
+  unidadesDisponibles Int           @map("unidades_disponibles")
+  urlImagen          String         @map("url_imagen")
+  creadoEn           DateTime       @default(now()) @map("creado_en")
+  actualizadoEn      DateTime       @updatedAt @map("actualizado_en")
+  transacciones      Transaccion[]
+
+  @@map("productos")
+}
+
+model Cliente {
+  id               String         @id @default(uuid())
+  nombreCompleto   String         @map("nombre_completo")
+  correoElectronico String        @map("correo_electronico")
+  numeroTelefono   String         @map("numero_telefono")
+  tipoDocumento    String         @map("tipo_documento")
+  numeroDocumento  String         @map("numero_documento")
+  creadoEn         DateTime       @default(now()) @map("creado_en")
+  entregas         Entrega[]
+  transacciones    Transaccion[]
+
+  @@map("clientes")
+}
+
+model Entrega {
+  id            String         @id @default(uuid())
+  clienteId     String         @map("cliente_id")
+  direccion     String         @map("direccion")
+  ciudad        String         @map("ciudad")
+  departamento  String         @map("departamento")
+  codigoPostal  String?        @map("codigo_postal")
+  estado        EstadoEntrega  @default(PENDIENTE)
+  creadoEn      DateTime       @default(now()) @map("creado_en")
+  cliente       Cliente        @relation(fields: [clienteId], references: [id])
+  transacciones Transaccion[]
+
+  @@map("entregas")
+}
+
+model Transaccion {
+  id                     String            @id @default(uuid())
+  referencia             String            @unique @map("referencia")
+  productoId             String            @map("producto_id")
+  clienteId              String            @map("cliente_id")
+  entregaId              String            @map("entrega_id")
+  idTransaccionPasarela  String?           @map("id_transaccion_pasarela")
+  montoProductoEnCentavos Int              @map("monto_producto_en_centavos")
+  tarifaBaseEnCentavos   Int               @map("tarifa_base_en_centavos")
+  tarifaEnvioEnCentavos  Int               @map("tarifa_envio_en_centavos")
+  montoTotalEnCentavos   Int               @map("monto_total_en_centavos")
+  estado                 EstadoTransaccion @default(PENDIENTE)
+  mensajeRespuesta       String?           @map("mensaje_respuesta")
+  creadoEn               DateTime          @default(now()) @map("creado_en")
+  actualizadoEn          DateTime          @updatedAt @map("actualizado_en")
+  producto               Producto          @relation(fields: [productoId], references: [id])
+  cliente                Cliente           @relation(fields: [clienteId], references: [id])
+  entrega                Entrega           @relation(fields: [entregaId], references: [id])
+
+  @@map("transacciones")
+}
