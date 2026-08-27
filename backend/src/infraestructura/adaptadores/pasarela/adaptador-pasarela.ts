@@ -10,9 +10,9 @@ import {
 
 @Injectable()
 export class AdaptadorPasarela implements ServicioPasarelaPagoPuerto {
-  private readonly baseUrl = 'https://api-sandbox.co.uat.wompi.dev/v1';
-  private readonly llavePrivada = 'prv_stagtest_5i0ZGIGiFcDQifYsXxvsny7Y37tKqFWg';
-  private readonly secretoIntegridad = 'stagtest_integrity_nAIBuqayW70XpUqJS4qf4STYiISd89Fp';
+  private readonly baseUrl = process.env.WOMPI_SANDBOX_URL || 'https://api-sandbox.co.uat.wompi.dev/v1';
+  private readonly llavePrivada = process.env.WOMPI_PRV_KEY || 'prv_stagtest_5i0ZGIGiFcDQifYsXxvsny7Y37tKqFWg';
+  private readonly secretoIntegridad = process.env.WOMPI_INTEGRITY_KEY || 'stagtest_integrity_nAlBuqayW70XpUqJS4qf4STYilSd89Fp';
 
   private generarFirmaIntegridad(referencia: string, montoEnCentavos: number, moneda: string): string {
     const cadena = `${referencia}${montoEnCentavos}${moneda}${this.secretoIntegridad}`;
@@ -44,14 +44,37 @@ export class AdaptadorPasarela implements ServicioPasarelaPagoPuerto {
         },
       });
 
-      const { id, status, status_message } = respuesta.data.data;
+      let transaccionData = respuesta.data.data;
+
+      // Si Wompi Sandbox responde en estado PENDING, esperar 2 segundos y consultar el estado final
+      if (transaccionData.status === 'PENDING') {
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        try {
+          const consulta = await axios.get(`${this.baseUrl}/transactions/${transaccionData.id}`, {
+            headers: { Authorization: `Bearer ${this.llavePrivada}` },
+          });
+          if (consulta.data?.data) {
+            transaccionData = consulta.data.data;
+          }
+        } catch {
+          // Si falla la consulta adicional, continuar con la respuesta original
+        }
+      }
+
+      let estadoMapeado: 'APROBADA' | 'RECHAZADA' | 'FALLIDA' = 'FALLIDA';
+      if (transaccionData.status === 'APPROVED') {
+        estadoMapeado = 'APROBADA';
+      } else if (transaccionData.status === 'DECLINED') {
+        estadoMapeado = 'RECHAZADA';
+      }
+
       return ok({
-        idTransaccion: id,
-        estado: status === 'APPROVED' ? 'APROBADA' : status === 'DECLINED' ? 'RECHAZADA' : 'FALLIDA',
-        mensaje: status_message || 'Transacción procesada',
+        idTransaccion: transaccionData.id,
+        estado: estadoMapeado,
+        mensaje: transaccionData.status_message || (estadoMapeado === 'APROBADA' ? 'Pago aprobado exitosamente' : 'Transacción procesada'),
       });
     } catch (error: any) {
-      const mensajeError = error.response?.data?.error?.reason || error.message || 'Error de conexión con la pasarela';
+      const mensajeError = error.response?.data?.error?.reason || error.response?.data?.message || error.message || 'Error de conexión con la pasarela';
       return err(new Error(mensajeError));
     }
   }
