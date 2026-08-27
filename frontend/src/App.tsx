@@ -8,7 +8,7 @@ import { EstadoTransaccion } from './componentes/resultado/EstadoTransaccion';
 export const App = () => {
   const dispatch = useDispatch();
   const { pasoActual, transaccionResultado } = useSelector((state: RootState) => state.pago);
-  const [modalAbierto, setModalAbierto] = useState(false);
+  const [modalAbierto, setModalAbierto] = useState(pasoActual === 2 || pasoActual === 3);
   const [producto] = useState({
     id: 'prod-001',
     nombre: 'Chaqueta Impermeable Urbana',
@@ -24,6 +24,7 @@ export const App = () => {
   };
 
   const cerrarModal = () => {
+    dispatch(establecerPaso(1));
     setModalAbierto(false);
   };
 
@@ -75,7 +76,7 @@ export const App = () => {
       </div>
 
       <ModalPago
-        abierto={modalAbierto || pasoActual === 2 || pasoActual === 3}
+        abierto={modalAbierto}
         alCerrar={cerrarModal}
       />
     </main>

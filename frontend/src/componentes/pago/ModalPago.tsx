@@ -102,14 +102,26 @@ export const ModalPago: React.FC<Props> = ({ abierto, alCerrar }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) alCerrar();
+      }}
+    >
       <div className="bg-white w-full max-w-md rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[90vh]">
         {/* Cabecera */}
         <div className="px-6 py-4 bg-slate-50 border-b flex justify-between items-center">
           <h2 className="text-lg font-semibold text-slate-800">
             {pasoActual === 2 ? 'Datos de Pago y Entrega' : 'Resumen de Compra'}
           </h2>
-          <button onClick={alCerrar} className="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
+          <button
+            type="button"
+            onClick={alCerrar}
+            className="w-8 h-8 flex items-center justify-center rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors text-2xl font-bold cursor-pointer leading-none"
+            aria-label="Cerrar modal"
+          >
+            &times;
+          </button>
         </div>
 
         {/* Contenido Dinámico */}

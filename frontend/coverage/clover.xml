@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1787797103728" clover="3.2.0">
-  <project timestamp="1787797103729" name="All files">
+<coverage generated="1787803366909" clover="3.2.0">
+  <project timestamp="1787803366909" name="All files">
     <metrics statements="18" coveredstatements="18" conditionals="13" coveredconditionals="11" methods="2" coveredmethods="2" elements="33" coveredelements="31" complexity="0" loc="18" ncloc="18" packages="1" files="1" classes="1"/>
     <file name="validadores-tarjeta.ts" path="/Users/gersonmercado/pasarela-ecom-app/frontend/src/utilidades/validadores-tarjeta.ts">
       <metrics statements="18" coveredstatements="18" conditionals="13" coveredconditionals="11" methods="2" coveredmethods="2"/>
