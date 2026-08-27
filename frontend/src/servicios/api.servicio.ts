@@ -40,7 +40,7 @@ export const tiendaServicio = {
     return respuesta.data;
   },
 
-  procesarTransaccion: async (cuerpo: any) => {
+  procesarTransaccion: async (cuerpo: Record<string, unknown>) => {
     const respuesta = await axios.post(`${API_URL}/transacciones`, cuerpo);
     return respuesta.data;
   },
