@@ -28,8 +28,9 @@ async function bootstrap() {
 
   // Habilitar CORS con soporte para preflight (OPTIONS)
   app.enableCors({
-    origin: origenesPermitidos,
+    origin: true, // Permite cualquier origen de forma dinámica reflejando el header
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    allowedHeaders: 'Content-Type,Accept,Authorization',
     credentials: true,
   });
 
