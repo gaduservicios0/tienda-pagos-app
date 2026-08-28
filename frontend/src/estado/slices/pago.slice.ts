@@ -64,16 +64,24 @@ const ESTADO_INICIAL_DEFECTO: EstadoPago = {
   transaccionResultado: null,
 };
 
-const cargarEstadoLocal = (): EstadoPago => {
-  const guardado = localStorage.getItem('estado_flujo_pago');
-  if (guardado) {
-    try {
-      return JSON.parse(guardado);
-    } catch {
-      return ESTADO_INICIAL_DEFECTO;
+export const cargarEstadoLocal = (): EstadoPago => {
+  if (typeof localStorage !== 'undefined') {
+    const guardado = localStorage.getItem('estado_flujo_pago');
+    if (guardado) {
+      try {
+        return JSON.parse(guardado);
+      } catch {
+        return ESTADO_INICIAL_DEFECTO;
+      }
     }
   }
   return ESTADO_INICIAL_DEFECTO;
+};
+
+export const guardarEnStorage = (estado: EstadoPago) => {
+  if (typeof localStorage !== 'undefined') {
+    localStorage.setItem('estado_flujo_pago', JSON.stringify(estado));
+  }
 };
 
 export const pagoSlice = createSlice({
@@ -82,22 +90,24 @@ export const pagoSlice = createSlice({
   reducers: {
     establecerPaso: (estado, accion: PayloadAction<number>) => {
       estado.pasoActual = accion.payload;
-      localStorage.setItem('estado_flujo_pago', JSON.stringify(estado));
+      guardarEnStorage(estado);
     },
     actualizarDatosTarjeta: (estado, accion: PayloadAction<Partial<EstadoPago['datosTarjeta']>>) => {
       estado.datosTarjeta = { ...estado.datosTarjeta, ...accion.payload };
-      localStorage.setItem('estado_flujo_pago', JSON.stringify(estado));
+      guardarEnStorage(estado);
     },
     actualizarDatosEntrega: (estado, accion: PayloadAction<Partial<EstadoPago['datosEntrega']>>) => {
       estado.datosEntrega = { ...estado.datosEntrega, ...accion.payload };
-      localStorage.setItem('estado_flujo_pago', JSON.stringify(estado));
+      guardarEnStorage(estado);
     },
     guardarResultado: (estado, accion: PayloadAction<EstadoPago['transaccionResultado']>) => {
       estado.transaccionResultado = accion.payload;
-      localStorage.setItem('estado_flujo_pago', JSON.stringify(estado));
+      guardarEnStorage(estado);
     },
     reiniciarFlujo: () => {
-      localStorage.removeItem('estado_flujo_pago');
+      if (typeof localStorage !== 'undefined') {
+        localStorage.removeItem('estado_flujo_pago');
+      }
       return ESTADO_INICIAL_DEFECTO;
     },
   },
