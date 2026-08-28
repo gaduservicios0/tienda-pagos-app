@@ -6,40 +6,20 @@ Aplicación Web de Comercio Electrónico y Pasarela de Pagos desarrollada con **
 
 ## 📑 Tabla de Contenido
 1. [Descripción General](#-descripción-general)
-2. [Cumplimiento de Rúbricas de Evaluación](#-cumplimiento-de-rúbricas-de-evaluación)
-3. [Características Principales](#-características-principales)
-4. [Flujo de Pago e Incorporación de Tarjetas](#-flujo-de-pago-e-incorporación-de-tarjetas)
-5. [Identidad Visual y Habilidades en CSS (Wompi Brand)](#-identidad-visual-y-habilidades-en-css-wompi-brand)
-6. [Arquitectura del Frontend](#-arquitectura-del-frontend)
-7. [Seguridad y Alineación OWASP](#-seguridad-y-alineación-owasp)
-8. [Reporte de Cobertura de Pruebas Unitarias (> 80%)](#-reporte-de-cobertura-de-pruebas-unitarias--80)
-9. [Variables de Entorno e Instalación](#-variables-de-entorno-e-instalación)
-10. [Despliegue en la Nube](#-despliegue-en-la-nube)
+2. [Características Principales](#-características-principales)
+3. [Flujo de Pago e Incorporación de Tarjetas](#-flujo-de-pago-e-incorporación-de-tarjetas)
+4. [Identidad Visual y Habilidades en CSS (Wompi Brand)](#-identidad-visual-y-habilidades-en-css-wompi-brand)
+5. [Arquitectura del Frontend](#-arquitectura-del-frontend)
+6. [Seguridad y Alineación OWASP](#-seguridad-y-alineación-owasp)
+7. [Reporte de Cobertura de Pruebas Unitarias (> 80%)](#-reporte-de-cobertura-de-pruebas-unitarias--80)
+8. [Variables de Entorno e Instalación](#-variables-de-entorno-e-instalación)
+9. [Despliegue en la Nube](#-despliegue-en-la-nube)
 
 ---
 
 ## 🌟 Descripción General
 
 Este proyecto implementa una experiencia integral de e-commerce donde el cliente puede seleccionar un producto, visualizar el desglose transparente de su compra mediante una superficie **Material Backdrop**, ingresar los datos de su tarjeta de crédito con validación instantánea según el algoritmo de **Luhn**, tokenizar la tarjeta de forma segura en **Wompi Sandbox** y procesar la transacción firmada criptográficamente con **SHA-256**.
-
----
-
-## 🎯 Cumplimiento de Rúbricas de Evaluación
-
-| Criterio | Puntos | Estado | Detalle de Implementación |
-| :--- | :---: | :---: | :--- |
-| **1. README completado correctamente** | **5 / 5** | ✅ Cumplido | Documentación exhaustiva con arquitectura, scripts, flujos y ejemplos. |
-| **2. Optimización y Renderizado de Imágenes** | **5 / 5** | ✅ Cumplido | Carga perezosa (`loading="lazy"`), contenedores responsivos y uso de SVGs vectoriales nativos. |
-| **3. Proceso Completo de Pago con Tarjeta** | **20 / 20** | ✅ Cumplido | Flujo de 4 pasos con tokenización, selección de cuotas (1-36), cálculo de tarifas y comprobante. |
-| **4. Integración y Consumo de API** | **20 / 20** | ✅ Cumplido | Consumo de `merchants`, `tokens/cards` y endpoints backend RESTful. |
-| **5. Cobertura de Pruebas (> 80%)** | **30 / 30** | ✅ Cumplido | **100% de Líneas, Sentencias y Funciones** en Frontend (Vitest) y Backend (Jest). |
-| **6. Despliegue en Nube** | **20 / 20** | ✅ Cumplido | Aplicación y API desplegadas en producción bajo HTTPS. |
-| **⭐ [Extra 1] OWASP, HTTPS y Seguridad** | **+5 pts** | ✅ Cumplido | Tokenización en cliente (PCI-DSS Level 1), firma de integridad SHA-256 y headers seguros. |
-| **⭐ [Extra 2] Responsividad Multi-Navegador** | **+5 pts** | ✅ Cumplido | 100% adaptable a Mobile, Tablet y Desktop (Chrome, Safari, Firefox, Edge). |
-| **⭐ [Extra 3] Habilidades Avanzadas en CSS** | **+10 pts** | ✅ Cumplido | Componente Material Backdrop, paleta oficial Wompi, tarjeta holográfica y animaciones fluidas. |
-| **⭐ [Extra 4] Código Limpio (Clean Code)** | **+10 pts** | ✅ Cumplido | TypeScript estricto (0 `any`), ESLint sin errores, componentes modulares y desacoplados. |
-| **⭐ [Extra 5] Arquitectura Hexagonal** | **+10 pts** | ✅ Cumplido | Conexión con Backend de Puertos y Adaptadores (`Dominio`, `Casos de Uso`, `Infraestructura`). |
-| **⭐ [Extra 6] Railway Oriented Programming (ROP)** | **+10 pts** | ✅ Cumplido | Manejo funcional de errores y estados deterministas en cliente y servidor. |
 
 ---
 

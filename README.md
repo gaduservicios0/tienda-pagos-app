@@ -4,25 +4,6 @@ Solución técnica integral de comercio electrónico y pasarela de pagos con tar
 
 ---
 
-## 🏆 Resumen de Rúbricas y Puntos Extra
-
-| Rúbrica / Criterio | Puntos | Estado |
-| :--- | :---: | :---: |
-| **1. README Completado Correctamente** | **5 / 5** | ✅ 100% |
-| **2. Imágenes Rápidas y Optimización UI/UX** | **5 / 5** | ✅ 100% |
-| **3. Proceso Completo de Pago con Tarjeta de Crédito** | **20 / 20** | ✅ 100% |
-| **4. API Funcional y Robusta** | **20 / 20** | ✅ 100% |
-| **5. Cobertura de Pruebas Unitarias (> 80%)** | **30 / 30** | ✅ 100% |
-| **6. Despliegue en la Nube de Frontend y Backend** | **20 / 20** | ✅ 100% |
-| **⭐ [Extra] Alineaciones OWASP, HTTPS y Encabezados de Seguridad** | **+5 pts** | ✅ 100% |
-| **⭐ [Extra] Aplicación Totalmente Responsiva y Multi-Navegador** | **+5 pts** | ✅ 100% |
-| **⭐ [Extra] Habilidades Avanzadas en CSS (Wompi Brand + Backdrop)** | **+10 pts** | ✅ 100% |
-| **⭐ [Extra] Código Limpio (Clean Code & SOLID)** | **+10 pts** | ✅ 100% |
-| **⭐ [Extra] Arquitectura Hexagonal (Puertos y Adaptadores)** | **+10 pts** | ✅ 100% |
-| **⭐ [Extra] Railway Oriented Programming (ROP con Result/Neverthrow)** | **+10 pts** | ✅ 100% |
-
----
-
 ## 📂 Estructura del Repositorio
 
 - **[`frontend/`](./frontend):** Aplicación SPA en React 19 + TypeScript + Redux Toolkit + Tailwind CSS + Vitest. (Ver [`frontend/README.md`](./frontend/README.md)).
