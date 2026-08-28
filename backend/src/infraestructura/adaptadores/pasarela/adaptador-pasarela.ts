@@ -32,7 +32,7 @@ export class AdaptadorPasarela implements ServicioPasarelaPagoPuerto {
         payment_method: {
           type: 'CARD',
           token: datos.tokenTarjeta,
-          installments: datos.cuotas,
+          installments: datos.cuotas || 1,
         },
         reference: datos.referencia,
       };
@@ -46,18 +46,21 @@ export class AdaptadorPasarela implements ServicioPasarelaPagoPuerto {
 
       let transaccionData = respuesta.data.data;
 
-      // Si Wompi Sandbox responde en estado PENDING, esperar 2 segundos y consultar el estado final
+      // Si Wompi Sandbox responde en estado PENDING, consultar hasta obtener estado final (máx 4 intentos)
       if (transaccionData.status === 'PENDING') {
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-        try {
-          const consulta = await axios.get(`${this.baseUrl}/transactions/${transaccionData.id}`, {
-            headers: { Authorization: `Bearer ${this.llavePrivada}` },
-          });
-          if (consulta.data?.data) {
-            transaccionData = consulta.data.data;
+        for (let intento = 0; intento < 4; intento++) {
+          await new Promise((resolve) => setTimeout(resolve, 1500));
+          try {
+            const consulta = await axios.get(`${this.baseUrl}/transactions/${transaccionData.id}`, {
+              headers: { Authorization: `Bearer ${this.llavePrivada}` },
+            });
+            if (consulta.data?.data?.status && consulta.data.data.status !== 'PENDING') {
+              transaccionData = consulta.data.data;
+              break;
+            }
+          } catch {
+            // Continuar con el siguiente reintento si la consulta falla temporalmente
           }
-        } catch {
-          // Si falla la consulta adicional, continuar con la respuesta original
         }
       }
 
@@ -66,15 +69,33 @@ export class AdaptadorPasarela implements ServicioPasarelaPagoPuerto {
         estadoMapeado = 'APROBADA';
       } else if (transaccionData.status === 'DECLINED') {
         estadoMapeado = 'RECHAZADA';
+      } else if (transaccionData.status === 'ERROR') {
+        estadoMapeado = 'FALLIDA';
       }
+
+      const mensaje = transaccionData.status_message || 
+        (estadoMapeado === 'APROBADA' ? 'Transacción aprobada con éxito' : 
+         estadoMapeado === 'RECHAZADA' ? 'Transacción rechazada por el banco emisor' : 'Error al procesar con la pasarela');
 
       return ok({
         idTransaccion: transaccionData.id,
         estado: estadoMapeado,
-        mensaje: transaccionData.status_message || (estadoMapeado === 'APROBADA' ? 'Pago aprobado exitosamente' : 'Transacción procesada'),
+        mensaje,
       });
     } catch (error: any) {
-      const mensajeError = error.response?.data?.error?.reason || error.response?.data?.message || error.message || 'Error de conexión con la pasarela';
+      let mensajeError = 'Error de conexión con la pasarela';
+      if (error.response?.data?.error?.reason) {
+        mensajeError = error.response.data.error.reason;
+      } else if (error.response?.data?.error?.messages) {
+        const mensajes = Object.entries(error.response.data.error.messages)
+          .map(([campo, msg]) => `${campo}: ${Array.isArray(msg) ? msg.join(', ') : msg}`)
+          .join('; ');
+        mensajeError = mensajes;
+      } else if (error.response?.data?.message) {
+        mensajeError = error.response.data.message;
+      } else if (error.message) {
+        mensajeError = error.message;
+      }
       return err(new Error(mensajeError));
     }
   }

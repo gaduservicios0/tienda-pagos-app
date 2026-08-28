@@ -11,14 +11,16 @@ const swagger_1 = require("@nestjs/swagger");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
     app.use((0, helmet_1.default)({
-        contentSecurityPolicy: true,
-        crossOriginEmbedderPolicy: true,
+        contentSecurityPolicy: false,
+        crossOriginEmbedderPolicy: false,
     }));
     app.enableCors({
-        origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
-        methods: 'GET,POST,PUT,DELETE',
+        origin: true,
+        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+        allowedHeaders: 'Content-Type,Accept,Authorization',
         credentials: true,
     });
+    app.setGlobalPrefix('api');
     app.useGlobalPipes(new common_1.ValidationPipe({
         whitelist: true,
         forbidNonWhitelisted: true,

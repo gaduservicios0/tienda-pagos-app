@@ -19,27 +19,27 @@ export declare class TransaccionesControlador {
         entrega: {
             id: string;
             creadoEn: Date;
-            estado: import("@prisma/client").$Enums.EstadoEntrega;
-            clienteId: string;
             direccion: string;
             ciudad: string;
             departamento: string;
             codigoPostal: string | null;
+            estado: import("@prisma/client").$Enums.EstadoEntrega;
+            clienteId: string;
         };
     } & {
         id: string;
         creadoEn: Date;
         actualizadoEn: Date;
+        productoId: string;
+        estado: import("@prisma/client").$Enums.EstadoTransaccion;
+        clienteId: string;
         referencia: string;
         idTransaccionPasarela: string | null;
         montoProductoEnCentavos: number;
         tarifaBaseEnCentavos: number;
         tarifaEnvioEnCentavos: number;
         montoTotalEnCentavos: number;
-        estado: import("@prisma/client").$Enums.EstadoTransaccion;
         mensajeRespuesta: string | null;
-        productoId: string;
-        clienteId: string;
         entregaId: string;
     }>;
 }

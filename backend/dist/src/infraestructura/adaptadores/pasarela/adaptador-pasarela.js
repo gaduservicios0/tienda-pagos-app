@@ -48,9 +48,9 @@ const axios_1 = __importDefault(require("axios"));
 const crypto = __importStar(require("crypto"));
 const neverthrow_1 = require("neverthrow");
 let AdaptadorPasarela = class AdaptadorPasarela {
-    baseUrl = 'https://api-sandbox.co.uat.wompi.dev/v1';
-    llavePrivada = 'prv_stagtest_5i0ZGIGiFcDQifYsXxvsny7Y37tKqFWg';
-    secretoIntegridad = 'stagtest_integrity_nAIBuqayW70XpUqJS4qf4STYiISd89Fp';
+    baseUrl = process.env.WOMPI_SANDBOX_URL || 'https://api-sandbox.co.uat.wompi.dev/v1';
+    llavePrivada = process.env.WOMPI_PRV_KEY || 'prv_stagtest_5i0ZGIGiFcDQifYsXxvsny7Y37tKqFWg';
+    secretoIntegridad = process.env.WOMPI_INTEGRITY_KEY || 'stagtest_integrity_nAlBuqayW70XpUqJS4qf4STYilSd89Fp';
     generarFirmaIntegridad(referencia, montoEnCentavos, moneda) {
         const cadena = `${referencia}${montoEnCentavos}${moneda}${this.secretoIntegridad}`;
         return crypto.createHash('sha256').update(cadena).digest('hex');
@@ -67,7 +67,7 @@ let AdaptadorPasarela = class AdaptadorPasarela {
                 payment_method: {
                     type: 'CARD',
                     token: datos.tokenTarjeta,
-                    installments: datos.cuotas,
+                    installments: datos.cuotas || 1,
                 },
                 reference: datos.referencia,
             };
@@ -77,15 +77,59 @@ let AdaptadorPasarela = class AdaptadorPasarela {
                     'Content-Type': 'application/json',
                 },
             });
-            const { id, status, status_message } = respuesta.data.data;
+            let transaccionData = respuesta.data.data;
+            if (transaccionData.status === 'PENDING') {
+                for (let intento = 0; intento < 4; intento++) {
+                    await new Promise((resolve) => setTimeout(resolve, 1500));
+                    try {
+                        const consulta = await axios_1.default.get(`${this.baseUrl}/transactions/${transaccionData.id}`, {
+                            headers: { Authorization: `Bearer ${this.llavePrivada}` },
+                        });
+                        if (consulta.data?.data?.status && consulta.data.data.status !== 'PENDING') {
+                            transaccionData = consulta.data.data;
+                            break;
+                        }
+                    }
+                    catch {
+                    }
+                }
+            }
+            let estadoMapeado = 'FALLIDA';
+            if (transaccionData.status === 'APPROVED') {
+                estadoMapeado = 'APROBADA';
+            }
+            else if (transaccionData.status === 'DECLINED') {
+                estadoMapeado = 'RECHAZADA';
+            }
+            else if (transaccionData.status === 'ERROR') {
+                estadoMapeado = 'FALLIDA';
+            }
+            const mensaje = transaccionData.status_message ||
+                (estadoMapeado === 'APROBADA' ? 'Transacción aprobada con éxito' :
+                    estadoMapeado === 'RECHAZADA' ? 'Transacción rechazada por el banco emisor' : 'Error al procesar con la pasarela');
             return (0, neverthrow_1.ok)({
-                idTransaccion: id,
-                estado: status === 'APPROVED' ? 'APROBADA' : status === 'DECLINED' ? 'RECHAZADA' : 'FALLIDA',
-                mensaje: status_message || 'Transacción procesada',
+                idTransaccion: transaccionData.id,
+                estado: estadoMapeado,
+                mensaje,
             });
         }
         catch (error) {
-            const mensajeError = error.response?.data?.error?.reason || error.message || 'Error de conexión con la pasarela';
+            let mensajeError = 'Error de conexión con la pasarela';
+            if (error.response?.data?.error?.reason) {
+                mensajeError = error.response.data.error.reason;
+            }
+            else if (error.response?.data?.error?.messages) {
+                const mensajes = Object.entries(error.response.data.error.messages)
+                    .map(([campo, msg]) => `${campo}: ${Array.isArray(msg) ? msg.join(', ') : msg}`)
+                    .join('; ');
+                mensajeError = mensajes;
+            }
+            else if (error.response?.data?.message) {
+                mensajeError = error.response.data.message;
+            }
+            else if (error.message) {
+                mensajeError = error.message;
+            }
             return (0, neverthrow_1.err)(new Error(mensajeError));
         }
     }

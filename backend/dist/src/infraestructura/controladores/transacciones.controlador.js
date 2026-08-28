@@ -1,10 +1,43 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
@@ -17,6 +50,7 @@ const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
 const adaptador_pasarela_1 = require("../adaptadores/pasarela/adaptador-pasarela");
 const client_1 = require("@prisma/client");
+const crypto = __importStar(require("crypto"));
 let TransaccionesControlador = class TransaccionesControlador {
     prisma = new client_1.PrismaClient();
     async procesarTransaccion(cuerpo) {
@@ -65,6 +99,9 @@ let TransaccionesControlador = class TransaccionesControlador {
                 estado: 'PENDIENTE',
             },
         });
+        const integritySecret = process.env.WOMPI_INTEGRITY_KEY || 'stagtest_integrity_nAlBuqayW70XpUqJS4qf4STYilSd89Fp';
+        const cadenaFirma = `${referencia}${total}COP${integritySecret}`;
+        const firmaIntegridad = crypto.createHash('sha256').update(cadenaFirma).digest('hex');
         const pasarela = new adaptador_pasarela_1.AdaptadorPasarela();
         const resultado = await pasarela.procesarPago({
             tokenAceptacion,
@@ -73,8 +110,8 @@ let TransaccionesControlador = class TransaccionesControlador {
             montoEnCentavos: total,
             moneda: 'COP',
             correoCliente: cliente.correoElectronico,
-            cuotas,
-            firmaIntegridad: '',
+            cuotas: Number(cuotas) || 1,
+            firmaIntegridad,
         });
         if (resultado.isErr()) {
             await this.prisma.transaccion.update({
@@ -84,17 +121,20 @@ let TransaccionesControlador = class TransaccionesControlador {
             return { idTransaccion: transaccion.id, estado: 'FALLIDA', mensaje: resultado.error.message };
         }
         const { idTransaccion, estado, mensaje } = resultado.value;
+        const estadoFinal = (String(estado) === 'APPROVED' || estado === 'APROBADA')
+            ? 'APROBADA'
+            : estado;
         await this.prisma.transaccion.update({
             where: { id: transaccion.id },
-            data: { idTransaccionPasarela: idTransaccion, estado, mensajeRespuesta: mensaje },
+            data: { idTransaccionPasarela: idTransaccion, estado: estadoFinal, mensajeRespuesta: mensaje },
         });
-        if (estado === 'APROBADA') {
+        if (estadoFinal === 'APROBADA') {
             await this.prisma.producto.update({
                 where: { id: producto.id },
                 data: { unidadesDisponibles: { decrement: 1 } },
             });
         }
-        return { idTransaccion: transaccion.id, estado, mensaje };
+        return { idTransaccion: transaccion.id, estado: estadoFinal, mensaje };
     }
     async consultarPorId(id) {
         const trx = await this.prisma.transaccion.findUnique({
@@ -126,6 +166,6 @@ __decorate([
 ], TransaccionesControlador.prototype, "consultarPorId", null);
 exports.TransaccionesControlador = TransaccionesControlador = __decorate([
     (0, swagger_1.ApiTags)('Transacciones'),
-    (0, common_1.Controller)('api/transacciones')
+    (0, common_1.Controller)('transacciones')
 ], TransaccionesControlador);
 //# sourceMappingURL=transacciones.controlador.js.map
