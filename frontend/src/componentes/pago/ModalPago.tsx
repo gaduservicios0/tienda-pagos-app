@@ -139,35 +139,36 @@ export const ModalPago: React.FC<Props> = ({ abierto, alCerrar }) => {
         productoId: 'prod-001',
         tokenAceptacion,
         tokenTarjeta,
-        cuotas: Number(datosTarjeta.cuotas) || 1,
+        cuotas: datosTarjeta.cuotas || 1,
         cliente: {
-          nombreCompleto: datosTarjeta.nombreTitular.trim() || datosEntrega.nombreCompleto || 'Cliente Prueba',
-          correoElectronico: datosEntrega.correoElectronico.trim(),
+          nombreCompleto: datosEntrega.nombreCompleto || datosTarjeta.nombreTitular,
+          correoElectronico: datosEntrega.correoElectronico,
           numeroTelefono: datosEntrega.numeroTelefono || '3001234567',
           tipoDocumento: datosEntrega.tipoDocumento || 'CC',
           numeroDocumento: datosEntrega.numeroDocumento || '1020304050',
         },
         entrega: {
-          direccion: datosEntrega.direccion.trim(),
+          direccion: datosEntrega.direccion,
           ciudad: datosEntrega.ciudad || 'Bogotá',
           departamento: datosEntrega.departamento || 'Cundinamarca',
-          codigoPostal: '110111',
+          pais: 'CO',
         },
       });
 
+      // Guardar el resultado en Redux y pasar a la pantalla de estado final (Paso 4)
       dispatch(guardarResultado(resPago.data));
       dispatch(establecerPaso(4));
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
-        const detalle =
+        const errorMsg = 
           err.response?.data?.error?.reason ||
-          err.response?.data?.mensaje ||
-          err.response?.data?.message ||
-          err.message ||
-          'Error al procesar el pago con la pasarela';
-        setErrorValidacion(`Error de pago: ${detalle}`);
+          err.response?.data?.mensaje || 
+          err.response?.data?.message || 
+          err.message || 
+          'Error al procesar el pago con la pasarela Wompi.';
+        setErrorValidacion(errorMsg);
       } else if (err instanceof Error) {
-        setErrorValidacion(`Error: ${err.message}`);
+        setErrorValidacion(err.message);
       } else {
         setErrorValidacion('Ocurrió un error inesperado al conectar con Wompi.');
       }
@@ -184,28 +185,31 @@ export const ModalPago: React.FC<Props> = ({ abierto, alCerrar }) => {
         if (e.target === e.currentTarget && !cargando) alCerrar();
       }}
     >
-      {/* Contenedor Material Backdrop */}
-      <div className="w-full max-w-lg bg-[#0A0E27] rounded-3xl shadow-2xl overflow-hidden border border-[#2B1B54] flex flex-col my-auto relative animate-in fade-in zoom-in-95 duration-200">
+      {/* Contenedor Material Backdrop con Identidad Wompi */}
+      <div className="w-full max-w-lg bg-[#2C2A29] rounded-3xl shadow-2xl overflow-hidden border border-[#00825A]/30 flex flex-col my-auto relative animate-in fade-in zoom-in-95 duration-200">
         
         {/* ============================================================ */}
         {/* BACK LAYER (Material Backdrop): Encabezado y Resumen Wompi */}
         {/* ============================================================ */}
-        <div className="bg-gradient-to-b from-[#0A0E27] via-[#131138] to-[#1C164D] text-white p-5 sm:p-6 relative">
-          {/* Barra superior de marca Wompi */}
+        <div className="bg-gradient-to-b from-[#2C2A29] via-[#201E1D] to-[#171515] text-white p-5 sm:p-6 relative">
+          {/* Barra superior con Logotipo Oficial Wompi */}
           <div className="flex items-center justify-between pb-4 border-b border-white/10">
             <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1.5">
-                <span className="text-2xl font-black tracking-tight text-white font-sans">wompi</span>
-                <span className="w-2.5 h-2.5 rounded-full bg-[#00E599] animate-pulse"></span>
+              <div className="bg-[#FAFAFA] px-2.5 py-1 rounded-xl shadow-sm flex items-center">
+                <img
+                  src="/assets/svg/Wompi_LogoPrincipal.svg"
+                  alt="Wompi"
+                  className="h-5 w-auto object-contain"
+                />
               </div>
-              <span className="text-[10px] uppercase font-extrabold tracking-wider bg-[#00E599]/15 text-[#00E599] border border-[#00E599]/30 px-2.5 py-0.5 rounded-full">
+              <span className="text-[10px] uppercase font-extrabold tracking-wider bg-[#B0F2AE] text-[#2C2A29] px-2.5 py-0.5 rounded-full font-sans shadow-sm">
                 Sandbox
               </span>
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="hidden sm:inline-flex items-center gap-1 text-[11px] text-slate-300 bg-white/5 px-2.5 py-1 rounded-full border border-white/10">
-                <ShieldCheck className="w-3.5 h-3.5 text-[#00E599]" />
+              <span className="hidden sm:inline-flex items-center gap-1 text-[11px] text-[#B0F2AE] bg-white/5 px-2.5 py-1 rounded-full border border-[#B0F2AE]/20">
+                <ShieldCheck className="w-3.5 h-3.5 text-[#B0F2AE]" />
                 Pago Seguro
               </span>
               <button
@@ -225,7 +229,7 @@ export const ModalPago: React.FC<Props> = ({ abierto, alCerrar }) => {
             <div>
               <p className="text-xs text-slate-400 font-medium">Total a Pagar</p>
               <div className="flex items-baseline gap-1.5">
-                <span className="text-2xl sm:text-3xl font-black text-[#00E599] tracking-tight">
+                <span className="text-2xl sm:text-3xl font-black text-[#B0F2AE] tracking-tight">
                   ${(montos.total / 100).toLocaleString('es-CO')}
                 </span>
                 <span className="text-xs font-bold text-slate-300">COP</span>
@@ -235,9 +239,9 @@ export const ModalPago: React.FC<Props> = ({ abierto, alCerrar }) => {
             <button
               type="button"
               onClick={() => setMostrarResumenBackdrop(!mostrarResumenBackdrop)}
-              className="flex items-center gap-1.5 text-xs font-bold text-white bg-white/10 hover:bg-white/20 px-3.5 py-2 rounded-full border border-white/15 transition-all cursor-pointer"
+              className="flex items-center gap-1.5 text-xs font-bold text-[#2C2A29] bg-[#B0F2AE] hover:bg-[#DFFF61] px-3.5 py-2 rounded-full transition-all cursor-pointer shadow-sm"
             >
-              <ShoppingBag className="w-3.5 h-3.5 text-[#00E599]" />
+              <ShoppingBag className="w-3.5 h-3.5 text-[#2C2A29]" />
               <span>{mostrarResumenBackdrop ? 'Ocultar Resumen' : 'Ver Resumen'}</span>
               {mostrarResumenBackdrop ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
             </button>
@@ -260,7 +264,7 @@ export const ModalPago: React.FC<Props> = ({ abierto, alCerrar }) => {
                     <p className="text-[10px] text-slate-400">Cantidad: 1 unidad</p>
                   </div>
                 </div>
-                <span className="font-bold text-slate-200">
+                <span className="font-bold text-[#B0F2AE]">
                   ${(montos.subtotal / 100).toLocaleString('es-CO')} COP
                 </span>
               </div>
@@ -276,18 +280,18 @@ export const ModalPago: React.FC<Props> = ({ abierto, alCerrar }) => {
                 </div>
                 <div className="flex justify-between text-slate-300">
                   <span className="flex items-center gap-1">
-                    <Truck className="w-3 h-3 text-[#00E599]" /> Envío Nacional
+                    <Truck className="w-3 h-3 text-[#B0F2AE]" /> Envío Nacional
                   </span>
                   <span>${(montos.tarifaEnvio / 100).toLocaleString('es-CO')} COP</span>
                 </div>
-                <div className="border-t border-white/10 pt-2 flex justify-between font-extrabold text-sm text-[#00E599]">
+                <div className="border-t border-white/10 pt-2 flex justify-between font-extrabold text-sm text-[#B0F2AE]">
                   <span>Total Liquidado</span>
                   <span>${(montos.total / 100).toLocaleString('es-CO')} COP</span>
                 </div>
               </div>
 
               <div className="flex items-center justify-center gap-2 text-[11px] text-slate-400">
-                <Lock className="w-3 h-3 text-[#00E599]" />
+                <Lock className="w-3 h-3 text-[#B0F2AE]" />
                 <span>Cifrado SSL de 256 bits respaldado por Bancolombia</span>
               </div>
             </div>
@@ -297,16 +301,16 @@ export const ModalPago: React.FC<Props> = ({ abierto, alCerrar }) => {
         {/* ============================================================ */}
         {/* FRONT LAYER (Material Backdrop): Formulario Interactivo Wompi */}
         {/* ============================================================ */}
-        <div className="bg-white text-slate-900 rounded-t-[28px] sm:rounded-t-[32px] p-5 sm:p-6 shadow-2xl flex flex-col relative z-20">
+        <div className="bg-[#FAFAFA] text-[#2C2A29] rounded-t-[28px] sm:rounded-t-[32px] p-5 sm:p-6 shadow-2xl flex flex-col relative z-20">
           
           {/* Manija táctil / Indicador de elevación Backdrop */}
           <div className="w-10 h-1 bg-slate-300 rounded-full mx-auto mb-4" />
 
           {/* Simulador Interactivo de Tarjeta de Crédito Wompi */}
-          <div className="w-full bg-gradient-to-tr from-[#0D0B24] via-[#241442] to-[#451466] rounded-2xl p-4 sm:p-5 text-white shadow-xl mb-5 relative overflow-hidden border border-[#3E216E]">
-            {/* Patrón holográfico de fondo */}
-            <div className="absolute top-0 right-0 w-36 h-36 bg-[#00E599]/10 rounded-full blur-2xl pointer-events-none" />
-            <div className="absolute -bottom-10 -left-10 w-36 h-36 bg-[#5820B0]/30 rounded-full blur-2xl pointer-events-none" />
+          <div className="w-full bg-gradient-to-tr from-[#2C2A29] via-[#1D1B1A] to-[#00825A] rounded-2xl p-4 sm:p-5 text-white shadow-xl mb-5 relative overflow-hidden border border-[#00825A]/40">
+            {/* Patrón decorativo con luz Wompi */}
+            <div className="absolute top-0 right-0 w-36 h-36 bg-[#B0F2AE]/20 rounded-full blur-2xl pointer-events-none" />
+            <div className="absolute -bottom-10 -left-10 w-36 h-36 bg-[#DFFF61]/15 rounded-full blur-2xl pointer-events-none" />
 
             <div className="flex justify-between items-start mb-4 relative z-10">
               <div className="flex items-center gap-2">
@@ -319,7 +323,7 @@ export const ModalPago: React.FC<Props> = ({ abierto, alCerrar }) => {
               </div>
 
               <div className="text-right">
-                <span className="inline-block px-2.5 py-0.5 rounded-md bg-white/15 backdrop-blur-sm text-xs font-black tracking-wider text-white border border-white/20">
+                <span className="inline-block px-2.5 py-0.5 rounded-md bg-white/15 backdrop-blur-sm text-xs font-black tracking-wider text-[#B0F2AE] border border-white/20">
                   {franquicia || 'TARJETA'}
                 </span>
               </div>
@@ -328,7 +332,7 @@ export const ModalPago: React.FC<Props> = ({ abierto, alCerrar }) => {
             {/* Número de Tarjeta en Vivo */}
             <div className="mb-4 relative z-10">
               <p className="text-[10px] text-slate-400 uppercase font-mono tracking-widest">Número de Tarjeta</p>
-              <p className="text-base sm:text-lg font-mono font-bold tracking-widest text-slate-100">
+              <p className="text-base sm:text-lg font-mono font-bold tracking-widest text-[#FAFAFA]">
                 {datosTarjeta.numero ? datosTarjeta.numero : '•••• •••• •••• ••••'}
               </p>
             </div>
@@ -367,8 +371,8 @@ export const ModalPago: React.FC<Props> = ({ abierto, alCerrar }) => {
           )}
 
           {mensajeEstado && (
-            <div className="mb-4 p-3 bg-[#00E599]/10 border border-[#00E599]/30 rounded-2xl flex items-center gap-2 text-xs text-[#0A0E27] font-semibold animate-pulse">
-              <Sparkles className="w-4 h-4 text-[#00E599] shrink-0" />
+            <div className="mb-4 p-3 bg-[#B0F2AE]/30 border border-[#00825A]/40 rounded-2xl flex items-center gap-2 text-xs text-[#00825A] font-bold animate-pulse">
+              <Sparkles className="w-4 h-4 text-[#00825A] shrink-0" />
               <span>{mensajeEstado}</span>
             </div>
           )}
@@ -378,14 +382,14 @@ export const ModalPago: React.FC<Props> = ({ abierto, alCerrar }) => {
             
             {/* 1. SECCIÓN: DATOS DE LA TARJETA */}
             <div className="space-y-3">
-              <div className="flex items-center gap-1.5 text-xs font-bold text-[#0A0E27] uppercase tracking-wider">
-                <CreditCard className="w-3.5 h-3.5 text-[#5820B0]" />
+              <div className="flex items-center gap-1.5 text-xs font-bold text-[#2C2A29] uppercase tracking-wider">
+                <CreditCard className="w-3.5 h-3.5 text-[#00825A]" />
                 <span>Datos de la Tarjeta</span>
               </div>
 
               {/* Nombre en la Tarjeta */}
               <div>
-                <label className="block text-xs font-bold text-slate-800 mb-1">
+                <label className="block text-xs font-bold text-[#2C2A29] mb-1">
                   Nombre del Titular en la Tarjeta <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
@@ -395,7 +399,7 @@ export const ModalPago: React.FC<Props> = ({ abierto, alCerrar }) => {
                     value={datosTarjeta.nombreTitular}
                     onChange={(e) => dispatch(actualizarDatosTarjeta({ nombreTitular: e.target.value }))}
                     placeholder="Ej. Cliente Prueba"
-                    className="w-full pl-9 pr-3 py-2.5 bg-white text-slate-900 border border-slate-300 rounded-xl text-xs font-semibold focus:ring-2 focus:ring-[#00E599] focus:border-[#00E599] outline-none transition-all placeholder:text-slate-400 shadow-sm"
+                    className="w-full pl-9 pr-3 py-2.5 bg-white text-[#2C2A29] border border-slate-300 rounded-xl text-xs font-semibold focus:ring-2 focus:ring-[#00825A] focus:border-[#00825A] outline-none transition-all placeholder:text-slate-400 shadow-sm"
                   />
                   <User className="w-4 h-4 text-slate-500 absolute left-3 top-3" />
                 </div>
@@ -403,7 +407,7 @@ export const ModalPago: React.FC<Props> = ({ abierto, alCerrar }) => {
 
               {/* Número de Tarjeta */}
               <div>
-                <label className="block text-xs font-bold text-slate-800 mb-1">
+                <label className="block text-xs font-bold text-[#2C2A29] mb-1">
                   Número de Tarjeta de Crédito <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
@@ -414,10 +418,10 @@ export const ModalPago: React.FC<Props> = ({ abierto, alCerrar }) => {
                     value={datosTarjeta.numero}
                     onChange={(e) => manejarCambioNumeroTarjeta(e.target.value)}
                     placeholder="4242 4242 4242 4242"
-                    className="w-full pl-9 pr-20 py-2.5 bg-white text-slate-900 border border-slate-300 rounded-xl text-xs font-mono font-bold focus:ring-2 focus:ring-[#00E599] focus:border-[#00E599] outline-none transition-all placeholder:text-slate-400 shadow-sm"
+                    className="w-full pl-9 pr-20 py-2.5 bg-white text-[#2C2A29] border border-slate-300 rounded-xl text-xs font-mono font-bold focus:ring-2 focus:ring-[#00825A] focus:border-[#00825A] outline-none transition-all placeholder:text-slate-400 shadow-sm"
                   />
                   <CreditCard className="w-4 h-4 text-slate-500 absolute left-3 top-3" />
-                  <span className="absolute right-3 top-2.5 text-[11px] font-black uppercase text-[#5820B0] bg-[#5820B0]/10 px-2 py-0.5 rounded-md">
+                  <span className="absolute right-3 top-2.5 text-[11px] font-black uppercase text-[#00825A] bg-[#B0F2AE]/50 px-2 py-0.5 rounded-md">
                     {franquicia || 'Tarjeta'}
                   </span>
                 </div>
@@ -432,7 +436,7 @@ export const ModalPago: React.FC<Props> = ({ abierto, alCerrar }) => {
               <div className="grid grid-cols-12 gap-2">
                 {/* Expiración (5 columnas) */}
                 <div className="col-span-5">
-                  <label className="block text-xs font-bold text-slate-800 mb-1">
+                  <label className="block text-xs font-bold text-[#2C2A29] mb-1">
                     Vence (MM/AA) <span className="text-red-500">*</span>
                   </label>
                   <div className="flex gap-1">
@@ -443,7 +447,7 @@ export const ModalPago: React.FC<Props> = ({ abierto, alCerrar }) => {
                       placeholder="MM"
                       value={datosTarjeta.mesVencimiento}
                       onChange={(e) => dispatch(actualizarDatosTarjeta({ mesVencimiento: e.target.value.replace(/\D/g, '') }))}
-                      className="w-1/2 text-center py-2.5 bg-white text-slate-900 border border-slate-300 rounded-xl text-xs font-mono font-bold focus:ring-2 focus:ring-[#00E599] outline-none shadow-sm"
+                      className="w-1/2 text-center py-2.5 bg-white text-[#2C2A29] border border-slate-300 rounded-xl text-xs font-mono font-bold focus:ring-2 focus:ring-[#00825A] outline-none shadow-sm"
                     />
                     <input
                       type="text"
@@ -452,14 +456,14 @@ export const ModalPago: React.FC<Props> = ({ abierto, alCerrar }) => {
                       placeholder="AA"
                       value={datosTarjeta.anioVencimiento}
                       onChange={(e) => dispatch(actualizarDatosTarjeta({ anioVencimiento: e.target.value.replace(/\D/g, '') }))}
-                      className="w-1/2 text-center py-2.5 bg-white text-slate-900 border border-slate-300 rounded-xl text-xs font-mono font-bold focus:ring-2 focus:ring-[#00E599] outline-none shadow-sm"
+                      className="w-1/2 text-center py-2.5 bg-white text-[#2C2A29] border border-slate-300 rounded-xl text-xs font-mono font-bold focus:ring-2 focus:ring-[#00825A] outline-none shadow-sm"
                     />
                   </div>
                 </div>
 
                 {/* CVC (3 columnas) */}
                 <div className="col-span-3">
-                  <label className="block text-xs font-bold text-slate-800 mb-1">
+                  <label className="block text-xs font-bold text-[#2C2A29] mb-1">
                     CVC <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
@@ -470,20 +474,20 @@ export const ModalPago: React.FC<Props> = ({ abierto, alCerrar }) => {
                       placeholder="123"
                       value={datosTarjeta.cvc}
                       onChange={(e) => dispatch(actualizarDatosTarjeta({ cvc: e.target.value.replace(/\D/g, '') }))}
-                      className="w-full text-center py-2.5 bg-white text-slate-900 border border-slate-300 rounded-xl text-xs font-mono font-bold focus:ring-2 focus:ring-[#00E599] outline-none shadow-sm"
+                      className="w-full text-center py-2.5 bg-white text-[#2C2A29] border border-slate-300 rounded-xl text-xs font-mono font-bold focus:ring-2 focus:ring-[#00825A] outline-none shadow-sm"
                     />
                   </div>
                 </div>
 
                 {/* Cuotas (4 columnas) */}
                 <div className="col-span-4">
-                  <label className="block text-xs font-bold text-slate-800 mb-1">
+                  <label className="block text-xs font-bold text-[#2C2A29] mb-1">
                     Cuotas <span className="text-red-500">*</span>
                   </label>
                   <select
                     value={datosTarjeta.cuotas || 1}
                     onChange={(e) => dispatch(actualizarDatosTarjeta({ cuotas: Number(e.target.value) }))}
-                    className="w-full py-2.5 px-2 bg-white text-slate-900 border border-slate-300 rounded-xl text-xs font-bold focus:ring-2 focus:ring-[#00E599] outline-none cursor-pointer shadow-sm"
+                    className="w-full py-2.5 px-2 bg-white text-[#2C2A29] border border-slate-300 rounded-xl text-xs font-bold focus:ring-2 focus:ring-[#00825A] outline-none cursor-pointer shadow-sm"
                   >
                     {Array.from({ length: 36 }, (_, i) => i + 1).map((n) => (
                       <option key={n} value={n}>
@@ -496,15 +500,15 @@ export const ModalPago: React.FC<Props> = ({ abierto, alCerrar }) => {
             </div>
 
             {/* 2. SECCIÓN: DATOS DE ENVÍO Y CONTACTO */}
-            <div className="space-y-3 pt-3 border-t border-slate-100">
-              <div className="flex items-center gap-1.5 text-xs font-bold text-[#0A0E27] uppercase tracking-wider">
-                <Truck className="w-3.5 h-3.5 text-[#5820B0]" />
+            <div className="space-y-3 pt-3 border-t border-slate-200">
+              <div className="flex items-center gap-1.5 text-xs font-bold text-[#2C2A29] uppercase tracking-wider">
+                <Truck className="w-3.5 h-3.5 text-[#00825A]" />
                 <span>Datos de Envío y Facturación</span>
               </div>
 
               {/* Correo Electrónico */}
               <div>
-                <label className="block text-xs font-bold text-slate-800 mb-1">
+                <label className="block text-xs font-bold text-[#2C2A29] mb-1">
                   Correo Electrónico de Notificación <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
@@ -514,7 +518,7 @@ export const ModalPago: React.FC<Props> = ({ abierto, alCerrar }) => {
                     value={datosEntrega.correoElectronico}
                     onChange={(e) => dispatch(actualizarDatosEntrega({ correoElectronico: e.target.value }))}
                     placeholder="gerson.mercado@outlook.com"
-                    className="w-full pl-9 pr-3 py-2.5 bg-white text-slate-900 border border-slate-300 rounded-xl text-xs font-semibold focus:ring-2 focus:ring-[#00E599] outline-none placeholder:text-slate-400 shadow-sm"
+                    className="w-full pl-9 pr-3 py-2.5 bg-white text-[#2C2A29] border border-slate-300 rounded-xl text-xs font-semibold focus:ring-2 focus:ring-[#00825A] outline-none placeholder:text-slate-400 shadow-sm"
                   />
                   <Mail className="w-4 h-4 text-slate-500 absolute left-3 top-3" />
                 </div>
@@ -522,7 +526,7 @@ export const ModalPago: React.FC<Props> = ({ abierto, alCerrar }) => {
 
               {/* Dirección de Entrega */}
               <div>
-                <label className="block text-xs font-bold text-slate-800 mb-1">
+                <label className="block text-xs font-bold text-[#2C2A29] mb-1">
                   Dirección de Entrega <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
@@ -532,7 +536,7 @@ export const ModalPago: React.FC<Props> = ({ abierto, alCerrar }) => {
                     value={datosEntrega.direccion}
                     onChange={(e) => dispatch(actualizarDatosEntrega({ direccion: e.target.value }))}
                     placeholder="Carrera 14A # 16-42"
-                    className="w-full pl-9 pr-3 py-2.5 bg-white text-slate-900 border border-slate-300 rounded-xl text-xs font-semibold focus:ring-2 focus:ring-[#00E599] outline-none placeholder:text-slate-400 shadow-sm"
+                    className="w-full pl-9 pr-3 py-2.5 bg-white text-[#2C2A29] border border-slate-300 rounded-xl text-xs font-semibold focus:ring-2 focus:ring-[#00825A] outline-none placeholder:text-slate-400 shadow-sm"
                   />
                   <MapPin className="w-4 h-4 text-slate-500 absolute left-3 top-3" />
                 </div>
@@ -546,7 +550,7 @@ export const ModalPago: React.FC<Props> = ({ abierto, alCerrar }) => {
                     type="text"
                     value={datosEntrega.ciudad || 'Bogotá'}
                     onChange={(e) => dispatch(actualizarDatosEntrega({ ciudad: e.target.value }))}
-                    className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-300 rounded-xl text-xs font-semibold focus:ring-2 focus:ring-[#00E599] outline-none shadow-sm"
+                    className="w-full px-3 py-2 bg-white text-[#2C2A29] border border-slate-300 rounded-xl text-xs font-semibold focus:ring-2 focus:ring-[#00825A] outline-none shadow-sm"
                   />
                 </div>
                 <div>
@@ -555,7 +559,7 @@ export const ModalPago: React.FC<Props> = ({ abierto, alCerrar }) => {
                     type="text"
                     value={datosEntrega.departamento || 'Cundinamarca'}
                     onChange={(e) => dispatch(actualizarDatosEntrega({ departamento: e.target.value }))}
-                    className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-300 rounded-xl text-xs font-semibold focus:ring-2 focus:ring-[#00E599] outline-none shadow-sm"
+                    className="w-full px-3 py-2 bg-white text-[#2C2A29] border border-slate-300 rounded-xl text-xs font-semibold focus:ring-2 focus:ring-[#00825A] outline-none shadow-sm"
                   />
                 </div>
               </div>
@@ -568,7 +572,7 @@ export const ModalPago: React.FC<Props> = ({ abierto, alCerrar }) => {
                   type="checkbox"
                   checked={aceptaTerminos}
                   onChange={(e) => setAceptaTerminos(e.target.checked)}
-                  className="mt-0.5 rounded border-slate-300 text-[#5820B0] focus:ring-[#00E599] cursor-pointer"
+                  className="mt-0.5 rounded border-slate-300 text-[#00825A] focus:ring-[#B0F2AE] cursor-pointer"
                 />
                 <span>
                   Acepto el{' '}
@@ -576,7 +580,7 @@ export const ModalPago: React.FC<Props> = ({ abierto, alCerrar }) => {
                     href="https://wompi.com/assets/downloadble/reglamento-Usuarios-Colombia.pdf"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[#5820B0] font-bold underline inline-flex items-center gap-0.5 hover:text-[#2B0938]"
+                    className="text-[#00825A] font-bold underline inline-flex items-center gap-0.5 hover:text-[#2C2A29]"
                   >
                     Reglamento de Usuarios de Wompi <ExternalLink className="w-2.5 h-2.5" />
                   </a>{' '}
@@ -589,24 +593,28 @@ export const ModalPago: React.FC<Props> = ({ abierto, alCerrar }) => {
             <button
               type="submit"
               disabled={cargando}
-              className="w-full py-4 px-6 rounded-full bg-[#00E599] hover:bg-[#00F0A0] active:scale-[0.99] disabled:opacity-50 text-[#0A0E27] font-black text-sm sm:text-base tracking-wide transition-all shadow-xl shadow-[#00E599]/25 flex items-center justify-center gap-2 cursor-pointer mt-2"
+              className="w-full py-4 px-6 rounded-full bg-[#B0F2AE] hover:bg-[#DFFF61] active:scale-[0.99] disabled:opacity-50 text-[#2C2A29] font-black text-sm sm:text-base tracking-wide transition-all shadow-xl shadow-[#B0F2AE]/30 flex items-center justify-center gap-2 cursor-pointer mt-2 border border-[#00825A]/20"
             >
               {cargando ? (
                 <>
-                  <div className="w-5 h-5 border-2 border-[#0A0E27] border-t-transparent rounded-full animate-spin"></div>
+                  <div className="w-5 h-5 border-2 border-[#2C2A29] border-t-transparent rounded-full animate-spin"></div>
                   <span>Procesando con Wompi...</span>
                 </>
               ) : (
                 <>
-                  <Lock className="w-4 h-4" />
+                  <Lock className="w-4 h-4 text-[#2C2A29]" />
                   <span>Pagar ${(montos.total / 100).toLocaleString('es-CO')} COP</span>
                 </>
               )}
             </button>
 
-            {/* Pie de seguridad Wompi */}
-            <div className="pt-2 flex items-center justify-center gap-2 text-[11px] text-slate-400 font-medium">
-              <ShieldCheck className="w-4 h-4 text-[#00E599]" />
+            {/* Pie de seguridad con Certificado PCI DSS */}
+            <div className="pt-2 flex items-center justify-center gap-3 text-[11px] text-slate-500 font-medium">
+              <img
+                src="/assets/svg/LogoCertificadoPCI.svg"
+                alt="PCI DSS"
+                className="h-5 w-auto object-contain"
+              />
               <span>Transacción protegida por pasarela Wompi Bancolombia</span>
             </div>
           </form>
