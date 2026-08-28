@@ -7,6 +7,15 @@ body {
   color: #1E293B;
 }
 
+/* Asegurar que las entradas de texto siempre tengan tipografía oscura de alta legibilidad */
+input, select, textarea {
+  color: #0f172a !important;
+}
+
+input::placeholder, textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
 /* Wompi Custom Animations & Gradients */
 @keyframes shimmer {
   0% { background-position: -200% 0; }

@@ -297,7 +297,7 @@ export const ModalPago: React.FC<Props> = ({ abierto, alCerrar }) => {
         {/* ============================================================ */}
         {/* FRONT LAYER (Material Backdrop): Formulario Interactivo Wompi */}
         {/* ============================================================ */}
-        <div className="bg-white rounded-t-[28px] sm:rounded-t-[32px] p-5 sm:p-6 shadow-2xl flex flex-col relative z-20">
+        <div className="bg-white text-slate-900 rounded-t-[28px] sm:rounded-t-[32px] p-5 sm:p-6 shadow-2xl flex flex-col relative z-20">
           
           {/* Manija táctil / Indicador de elevación Backdrop */}
           <div className="w-10 h-1 bg-slate-300 rounded-full mx-auto mb-4" />
@@ -385,7 +385,7 @@ export const ModalPago: React.FC<Props> = ({ abierto, alCerrar }) => {
 
               {/* Nombre en la Tarjeta */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label className="block text-xs font-bold text-slate-800 mb-1">
                   Nombre del Titular en la Tarjeta <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
@@ -395,15 +395,15 @@ export const ModalPago: React.FC<Props> = ({ abierto, alCerrar }) => {
                     value={datosTarjeta.nombreTitular}
                     onChange={(e) => dispatch(actualizarDatosTarjeta({ nombreTitular: e.target.value }))}
                     placeholder="Ej. Cliente Prueba"
-                    className="w-full pl-9 pr-3 py-2.5 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-[#00E599] focus:border-[#00E599] outline-none transition-all placeholder:text-slate-400"
+                    className="w-full pl-9 pr-3 py-2.5 bg-white text-slate-900 border border-slate-300 rounded-xl text-xs font-semibold focus:ring-2 focus:ring-[#00E599] focus:border-[#00E599] outline-none transition-all placeholder:text-slate-400 shadow-sm"
                   />
-                  <User className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                  <User className="w-4 h-4 text-slate-500 absolute left-3 top-3" />
                 </div>
               </div>
 
               {/* Número de Tarjeta */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label className="block text-xs font-bold text-slate-800 mb-1">
                   Número de Tarjeta de Crédito <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
@@ -414,9 +414,9 @@ export const ModalPago: React.FC<Props> = ({ abierto, alCerrar }) => {
                     value={datosTarjeta.numero}
                     onChange={(e) => manejarCambioNumeroTarjeta(e.target.value)}
                     placeholder="4242 4242 4242 4242"
-                    className="w-full pl-9 pr-20 py-2.5 border border-slate-200 rounded-xl text-xs font-mono font-bold focus:ring-2 focus:ring-[#00E599] focus:border-[#00E599] outline-none transition-all placeholder:text-slate-400"
+                    className="w-full pl-9 pr-20 py-2.5 bg-white text-slate-900 border border-slate-300 rounded-xl text-xs font-mono font-bold focus:ring-2 focus:ring-[#00E599] focus:border-[#00E599] outline-none transition-all placeholder:text-slate-400 shadow-sm"
                   />
-                  <CreditCard className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                  <CreditCard className="w-4 h-4 text-slate-500 absolute left-3 top-3" />
                   <span className="absolute right-3 top-2.5 text-[11px] font-black uppercase text-[#5820B0] bg-[#5820B0]/10 px-2 py-0.5 rounded-md">
                     {franquicia || 'Tarjeta'}
                   </span>
@@ -432,7 +432,7 @@ export const ModalPago: React.FC<Props> = ({ abierto, alCerrar }) => {
               <div className="grid grid-cols-12 gap-2">
                 {/* Expiración (5 columnas) */}
                 <div className="col-span-5">
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                  <label className="block text-xs font-bold text-slate-800 mb-1">
                     Vence (MM/AA) <span className="text-red-500">*</span>
                   </label>
                   <div className="flex gap-1">
@@ -443,7 +443,7 @@ export const ModalPago: React.FC<Props> = ({ abierto, alCerrar }) => {
                       placeholder="MM"
                       value={datosTarjeta.mesVencimiento}
                       onChange={(e) => dispatch(actualizarDatosTarjeta({ mesVencimiento: e.target.value.replace(/\D/g, '') }))}
-                      className="w-1/2 text-center py-2.5 border border-slate-200 rounded-xl text-xs font-mono font-bold focus:ring-2 focus:ring-[#00E599] outline-none"
+                      className="w-1/2 text-center py-2.5 bg-white text-slate-900 border border-slate-300 rounded-xl text-xs font-mono font-bold focus:ring-2 focus:ring-[#00E599] outline-none shadow-sm"
                     />
                     <input
                       type="text"
@@ -452,14 +452,14 @@ export const ModalPago: React.FC<Props> = ({ abierto, alCerrar }) => {
                       placeholder="AA"
                       value={datosTarjeta.anioVencimiento}
                       onChange={(e) => dispatch(actualizarDatosTarjeta({ anioVencimiento: e.target.value.replace(/\D/g, '') }))}
-                      className="w-1/2 text-center py-2.5 border border-slate-200 rounded-xl text-xs font-mono font-bold focus:ring-2 focus:ring-[#00E599] outline-none"
+                      className="w-1/2 text-center py-2.5 bg-white text-slate-900 border border-slate-300 rounded-xl text-xs font-mono font-bold focus:ring-2 focus:ring-[#00E599] outline-none shadow-sm"
                     />
                   </div>
                 </div>
 
                 {/* CVC (3 columnas) */}
                 <div className="col-span-3">
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                  <label className="block text-xs font-bold text-slate-800 mb-1">
                     CVC <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
@@ -470,20 +470,20 @@ export const ModalPago: React.FC<Props> = ({ abierto, alCerrar }) => {
                       placeholder="123"
                       value={datosTarjeta.cvc}
                       onChange={(e) => dispatch(actualizarDatosTarjeta({ cvc: e.target.value.replace(/\D/g, '') }))}
-                      className="w-full text-center py-2.5 border border-slate-200 rounded-xl text-xs font-mono font-bold focus:ring-2 focus:ring-[#00E599] outline-none"
+                      className="w-full text-center py-2.5 bg-white text-slate-900 border border-slate-300 rounded-xl text-xs font-mono font-bold focus:ring-2 focus:ring-[#00E599] outline-none shadow-sm"
                     />
                   </div>
                 </div>
 
                 {/* Cuotas (4 columnas) */}
                 <div className="col-span-4">
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                  <label className="block text-xs font-bold text-slate-800 mb-1">
                     Cuotas <span className="text-red-500">*</span>
                   </label>
                   <select
                     value={datosTarjeta.cuotas || 1}
                     onChange={(e) => dispatch(actualizarDatosTarjeta({ cuotas: Number(e.target.value) }))}
-                    className="w-full py-2.5 px-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:ring-2 focus:ring-[#00E599] outline-none cursor-pointer"
+                    className="w-full py-2.5 px-2 bg-white text-slate-900 border border-slate-300 rounded-xl text-xs font-bold focus:ring-2 focus:ring-[#00E599] outline-none cursor-pointer shadow-sm"
                   >
                     {Array.from({ length: 36 }, (_, i) => i + 1).map((n) => (
                       <option key={n} value={n}>
@@ -504,7 +504,7 @@ export const ModalPago: React.FC<Props> = ({ abierto, alCerrar }) => {
 
               {/* Correo Electrónico */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label className="block text-xs font-bold text-slate-800 mb-1">
                   Correo Electrónico de Notificación <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
@@ -514,15 +514,15 @@ export const ModalPago: React.FC<Props> = ({ abierto, alCerrar }) => {
                     value={datosEntrega.correoElectronico}
                     onChange={(e) => dispatch(actualizarDatosEntrega({ correoElectronico: e.target.value }))}
                     placeholder="gerson.mercado@outlook.com"
-                    className="w-full pl-9 pr-3 py-2.5 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-[#00E599] outline-none placeholder:text-slate-400"
+                    className="w-full pl-9 pr-3 py-2.5 bg-white text-slate-900 border border-slate-300 rounded-xl text-xs font-semibold focus:ring-2 focus:ring-[#00E599] outline-none placeholder:text-slate-400 shadow-sm"
                   />
-                  <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                  <Mail className="w-4 h-4 text-slate-500 absolute left-3 top-3" />
                 </div>
               </div>
 
               {/* Dirección de Entrega */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label className="block text-xs font-bold text-slate-800 mb-1">
                   Dirección de Entrega <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
@@ -532,30 +532,30 @@ export const ModalPago: React.FC<Props> = ({ abierto, alCerrar }) => {
                     value={datosEntrega.direccion}
                     onChange={(e) => dispatch(actualizarDatosEntrega({ direccion: e.target.value }))}
                     placeholder="Carrera 14A # 16-42"
-                    className="w-full pl-9 pr-3 py-2.5 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-[#00E599] outline-none placeholder:text-slate-400"
+                    className="w-full pl-9 pr-3 py-2.5 bg-white text-slate-900 border border-slate-300 rounded-xl text-xs font-semibold focus:ring-2 focus:ring-[#00E599] outline-none placeholder:text-slate-400 shadow-sm"
                   />
-                  <MapPin className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                  <MapPin className="w-4 h-4 text-slate-500 absolute left-3 top-3" />
                 </div>
               </div>
 
               {/* Ciudad y Departamento */}
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-600 mb-1">Ciudad</label>
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">Ciudad</label>
                   <input
                     type="text"
                     value={datosEntrega.ciudad || 'Bogotá'}
                     onChange={(e) => dispatch(actualizarDatosEntrega({ ciudad: e.target.value }))}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-[#00E599] outline-none"
+                    className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-300 rounded-xl text-xs font-semibold focus:ring-2 focus:ring-[#00E599] outline-none shadow-sm"
                   />
                 </div>
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-600 mb-1">Departamento</label>
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">Departamento</label>
                   <input
                     type="text"
                     value={datosEntrega.departamento || 'Cundinamarca'}
                     onChange={(e) => dispatch(actualizarDatosEntrega({ departamento: e.target.value }))}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-[#00E599] outline-none"
+                    className="w-full px-3 py-2 bg-white text-slate-900 border border-slate-300 rounded-xl text-xs font-semibold focus:ring-2 focus:ring-[#00E599] outline-none shadow-sm"
                   />
                 </div>
               </div>
