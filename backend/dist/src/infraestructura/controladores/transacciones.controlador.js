@@ -99,7 +99,7 @@ let TransaccionesControlador = class TransaccionesControlador {
                 estado: 'PENDIENTE',
             },
         });
-        const integritySecret = process.env.WOMPI_INTEGRITY_KEY || 'stagtest_integrity_nAlBuqayW70XpUqJS4qf4STYilSd89Fp';
+        const integritySecret = process.env.WOMPI_INTEGRITY_KEY || 'stagtest_integrity_nAIBuqayW70XpUqJS4qf4STYiISd89Fp';
         const cadenaFirma = `${referencia}${total}COP${integritySecret}`;
         const firmaIntegridad = crypto.createHash('sha256').update(cadenaFirma).digest('hex');
         const pasarela = new adaptador_pasarela_1.AdaptadorPasarela();

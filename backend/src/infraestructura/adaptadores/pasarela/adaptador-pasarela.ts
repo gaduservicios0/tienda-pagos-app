@@ -12,7 +12,7 @@ import {
 export class AdaptadorPasarela implements ServicioPasarelaPagoPuerto {
   private readonly baseUrl = process.env.WOMPI_SANDBOX_URL || 'https://api-sandbox.co.uat.wompi.dev/v1';
   private readonly llavePrivada = process.env.WOMPI_PRV_KEY || 'prv_stagtest_5i0ZGIGiFcDQifYsXxvsny7Y37tKqFWg';
-  private readonly secretoIntegridad = process.env.WOMPI_INTEGRITY_KEY || 'stagtest_integrity_nAlBuqayW70XpUqJS4qf4STYilSd89Fp';
+  private readonly secretoIntegridad = process.env.WOMPI_INTEGRITY_KEY || 'stagtest_integrity_nAIBuqayW70XpUqJS4qf4STYiISd89Fp';
 
   private generarFirmaIntegridad(referencia: string, montoEnCentavos: number, moneda: string): string {
     const cadena = `${referencia}${montoEnCentavos}${moneda}${this.secretoIntegridad}`;

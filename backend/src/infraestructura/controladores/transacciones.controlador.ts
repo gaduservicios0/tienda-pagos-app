@@ -68,7 +68,7 @@ export class TransaccionesControlador {
     });
 
     // 4. Calcular firma de integridad SHA-256 obligatoria para Sandbox de Wompi
-    const integritySecret = process.env.WOMPI_INTEGRITY_KEY || 'stagtest_integrity_nAlBuqayW70XpUqJS4qf4STYilSd89Fp';
+    const integritySecret = process.env.WOMPI_INTEGRITY_KEY || 'stagtest_integrity_nAIBuqayW70XpUqJS4qf4STYiISd89Fp';
     const cadenaFirma = `${referencia}${total}COP${integritySecret}`;
     const firmaIntegridad = crypto.createHash('sha256').update(cadenaFirma).digest('hex');
 
